@@ -1,0 +1,285 @@
+{% extends "layout.html" %}
+
+{% block title %} Brainware {% endblock %}
+
+{% block content %}
+<div class="w-full max-w-screen-xl mx-auto">
+    <div class="flex items-center py-3">
+        <form class="flex items-center w-full max-w-lg ml-auto">
+            <label for="simple-search" class="sr-only">Search</label>
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <i class="text-gray-500 dark:text-gray-300 fi fi-br-document"></i>
+                </div>
+                <input type="text" id="simple-search" name="s"
+                    class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Search article" required />
+            </div>
+            <button type="submit"
+                class="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                </svg>
+                <span class="sr-only">Search</span>
+            </button>
+        </form>
+    </div>
+    <div class="flex flex-col mt-3 pb-20">
+        <div class="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-xl bg-clip-border">
+            <div class="relative mx-5 mt-5 overflow-hidden text-gray-700 bg-white rounded-none bg-clip-border">
+                <div class="flex items-center justify-between gap-8 mb-8">
+                    <div>
+                        <h5 class="text-xl text-neutral-800 font-bold leading-snug tracking-normal">Fasttext articles</h5>
+                        <p class="block mt-1 font-sans text-base antialiased font-normal leading-relaxed text-gray-700">
+                            See information about all articles
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-5 px-0">
+                <table class="w-full mt-3 text-left table-auto min-w-max">
+                    <thead>
+                        <tr>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Article id
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Title
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Status
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Similarity Rate
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in fasttext_articles %}
+                            <tr>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <p
+                                        class="block font-sans text-sm antialiased font-medium leading-normal text-slate-800">
+                                        {{ article.id|stringformat:"07d" }}
+                                    </p>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <p
+                                        class="block font-sans text-sm antialiased font-normal leading-normal text-slate-800">
+                                        {{ article.title|title }}
+                                    </p>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <div class="w-max">
+                                        {% if article.is_recommended %}
+                                            <div
+                                                class="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-emerald-800 uppercase rounded-md select-none whitespace-nowrap bg-emerald-500/20">
+                                                <span class="">r</span>
+                                            </div>
+                                        {% else %}
+                                            <div
+                                                class="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-red-800 uppercase rounded-md select-none whitespace-nowrap bg-red-500/20">
+                                                <span class="">nr</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <p
+                                        class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                        {{ article.similarityRate|floatformat:"3" }}%
+                                    </p>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <button
+                                        id="{{ article.index }}"
+                                        onclick='read_article(event)'
+                                        class="relative select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-blue-500 transition-all hover:text-blue-800 active:text-blue-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
+                                        Read
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex items-center justify-between p-5 border-t border-blue-gray-50">
+                <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    Page {{ fpage }} of {{ total_pages }}
+                </p>
+                <div class="flex gap-2">
+                    {% if fpage != 1 %}
+                        <a
+                            href="{% url 'index' %}?fpage={{ fpage|add:'-1' }}&spage={{ spage }}"
+                            class="select-none rounded-lg border border-gray-800 py-2 px-5 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                            type="button">
+                            Previous
+                        </a>
+                    {% endif %}
+                    {% if fpage != total_pages %}
+                        <a
+                            href="{% url 'index' %}?fpage={{ fpage|add:'1' }}&spage={{ spage }}"
+                            class="select-none rounded-lg border border-gray-800 py-2 px-5 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                            type="button">
+                            Next
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-md rounded-xl bg-clip-border mt-3">
+            <div class="relative mx-5 mt-5 overflow-hidden text-gray-700 bg-white rounded-none bg-clip-border">
+                <div class="flex items-center justify-between gap-8 mb-8">
+                    <div>
+                        <h5 class="text-xl text-neutral-800 font-bold leading-snug tracking-normal">Scibert articles</h5>
+                        <p class="block mt-1 font-sans text-base antialiased font-normal leading-relaxed text-gray-700">
+                            See information about all articles
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-5 px-0">
+                <table class="w-full mt-3 text-left table-auto min-w-max">
+                    <thead>
+                        <tr>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Article id
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Title
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Status
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                    Similarity Rate
+                                </p>
+                            </th>
+                            <th class="p-5 border-y border-blue-gray-100 bg-blue-gray-50/50">
+                                <p
+                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70">
+                                </p>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in scibert_articles %}
+                            <tr>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <p
+                                        class="block font-sans text-sm antialiased font-medium leading-normal text-slate-800">
+                                        {{ article.id|stringformat:"07d" }}
+                                    </p>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <p
+                                        class="block font-sans text-sm antialiased font-normal leading-normal text-slate-800">
+                                        {{ article.title|title }}
+                                    </p>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <div class="w-max">
+                                        {% if article.is_recommended %}
+                                            <div
+                                                class="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-emerald-800 uppercase rounded-md select-none whitespace-nowrap bg-emerald-500/20">
+                                                <span class="">r</span>
+                                            </div>
+                                        {% else %}
+                                            <div
+                                                class="relative grid items-center px-2 py-1 font-sans text-xs font-bold text-red-800 uppercase rounded-md select-none whitespace-nowrap bg-red-500/20">
+                                                <span class="">nr</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <p
+                                        class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                                        {{ article.similarityRate|floatformat:"3" }}%
+                                    </p>
+                                </td>
+                                <td class="p-5 border-b border-blue-gray-50">
+                                    <button
+                                        id="{{ article.index }}"
+                                        onclick='read_article(event)'
+                                        class="relative select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-blue-500 transition-all hover:text-blue-800 active:text-blue-800 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none">
+                                        Read
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex items-center justify-between p-5 border-t border-blue-gray-50">
+                <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
+                    Page {{ spage }} of {{ total_pages }}
+                </p>
+                <div class="flex gap-2">
+                    {% if spage != 1 %}
+                        <a
+                            href="{% url 'index' %}?fpage={{ fpage }}&spage={{ spage|add:'-1' }}"
+                            class="select-none rounded-lg border border-gray-800 py-2 px-5 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                            type="button">
+                            Previous
+                        </a>
+                    {% endif %}
+                    {% if spage != total_pages %}
+                        <a
+                            href="{% url 'index' %}?fpage={{ fpage }}&spage={{ spage|add:'1' }}"
+                            class="select-none rounded-lg border border-gray-800 py-2 px-5 text-center align-middle font-sans text-xs font-bold uppercase text-gray-900 transition-all hover:opacity-75 focus:ring focus:ring-gray-300 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                            type="button">
+                            Next
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        async function read_article(event) {
+            const article_id = event.currentTarget.id;
+
+            const response = await fetch("/read-article", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ article_id: parseInt(article_id) }),
+            })
+        }
+    </script>
+{% endblock %}
